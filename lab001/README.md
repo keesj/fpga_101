@@ -88,12 +88,12 @@ Migen will then generates the verilog file (you can find it in ./build/top.v) an
 will use Vivado to build the design. The bitstream should be generated in a couple
 of minutes and is the ./build/top.bit file.
 
-Provided load.py script will allow you to load it to the Nexys4DDR.
+Provided load.py script will allow you to load it to the TinyFPGA-BX board.
 
 [> Instructions
 ---------------
 1) Build the design (base.py) and load it (load.py)
-2) System clock is 100Mhz, make the led blink at 1Hz
+2) System clock is 16Mhz, make the led blink at 1Hz
 3) Connect the 16 switches to the 16 leds.
 4) Same as 3), but invert the polarity on the 8 first leds.
 5) Make one of the rgb led blink at: 1Hz for the red, 2Hz for the green,

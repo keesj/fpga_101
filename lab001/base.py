@@ -2,7 +2,6 @@
 from migen import *
 from migen.build.generic_platform import *
 from migen.build.lattice import LatticePlatform
-from migen.build.lattice.programmer import TinyProgProgrammer
 
 #
 # platform
