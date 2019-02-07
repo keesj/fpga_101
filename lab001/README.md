@@ -10,7 +10,7 @@
 
 [> Presentation / Goals
 -----------------------
-During this lab, we will generate our first FPGA design on the Nexys4DDR.
+During this lab, we will generate our first FPGA design on the tinyFPGA-BX.
 The base design is a simple led blinker and we will modify it to change
 the functionality and understand what can be easily done with FPGAs.
 
@@ -27,42 +27,36 @@ Migen's imports
 ```python
 from migen import *
 from migen.build.generic_platform import *
-from migen.build.xilinx import XilinxPlatform
+from migen.build.lattice import LatticePlatform
 ```
 
 IOs definition. During this lab we will add some IOs
 according to the Nesys4DDR's pinout.
 ```python
 _io = [
-    ("user_led",  0, Pins("H17"), IOStandard("LVCMOS33")),
-
-    ("user_sw",  0, Pins("J15"), IOStandard("LVCMOS33")),
-
-    ("user_btn", 0, Pins("N17"), IOStandard("LVCMOS33")),
-
-    ("clk100", 0, Pins("E3"), IOStandard("LVCMOS33")),
-
-    ("cpu_reset", 0, Pins("C12"), IOStandard("LVCMOS33")),
+    ("user_led", 0, Pins("B3"), IOStandard("LVCMOS33")),
+    ("clk16", 0, Pins("B2"), IOStandard("LVCMOS33")),
 ]
 ```
 
 Platform creation. Here we create a Platform module that will
 defines:
-- the type of FPGA on the Nexys4DDR (Xilinx Artix7 100T in CSG324 package  / speedgrade 1)
-- the toolchain (Vivado)
-- the default system clock to use (clk100 pin) and the default system frequency (100MHz)
+- the type of FPGA on the TinyFPGA-BX (is ice40)
+- the toolchain (the open source icestorm)
+- the default system clock to use (clk16 pin) and the default system frequency (16MHz)
 We are not going to change things here during this lab.
 
 ```python
-class Platform(XilinxPlatform):
-    default_clk_name = "clk100"
-    default_clk_period = 10.0
+class Platform(LatticePlatform):
+    default_clk_name = "clk16"
+    default_clk_period = 62.5
 
     def __init__(self):
-        XilinxPlatform.__init__(self, "xc7a100t-CSG324-1", _io, toolchain="vivado")
+        LatticePlatform.__init__(self, "ice40-lp8k-cm81", _io,
+                                 toolchain="icestorm")
 
     def do_finalize(self, fragment):
-        XilinxPlatform.do_finalize(self, fragment)
+        LatticePlatform.do_finalize(self, fragment)
 ```
 
 We then declare our platform and request the led pin.
@@ -89,7 +83,6 @@ module.sync += counter.eq(counter + 1)
 Once design is done, we can build our module and generate the FPGA bitstream.
 ```python
 platform.build(module)
-
 ```
 Migen will then generates the verilog file (you can find it in ./build/top.v) and
 will use Vivado to build the design. The bitstream should be generated in a couple
