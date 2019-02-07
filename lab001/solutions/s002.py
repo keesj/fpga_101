@@ -1,33 +1,28 @@
+#!/usr/bin/env python3
 from migen import *
 from migen.build.generic_platform import *
-from migen.build.xilinx import XilinxPlatform
+from migen.build.lattice import LatticePlatform
 
 #
 # platform
 #
 
 _io = [
-    ("user_led",  0, Pins("H17"), IOStandard("LVCMOS33")),
-
-    ("user_sw",  0, Pins("J15"), IOStandard("LVCMOS33")),
-
-    ("user_btn", 0, Pins("N17"), IOStandard("LVCMOS33")),
-
-    ("clk100", 0, Pins("E3"), IOStandard("LVCMOS33")),
-
-    ("cpu_reset", 0, Pins("C12"), IOStandard("LVCMOS33")),
+    ("user_led", 0, Pins("B3"), IOStandard("LVCMOS33")),
+    ("clk16", 0, Pins("B2"), IOStandard("LVCMOS33")),
 ]
 
 
-class Platform(XilinxPlatform):
-    default_clk_name = "clk100"
-    default_clk_period = 10.0
+class Platform(LatticePlatform):
+    default_clk_name = "clk16"
+    default_clk_period = 62.5
 
     def __init__(self):
-        XilinxPlatform.__init__(self, "xc7a100t-CSG324-1", _io, toolchain="vivado")
+        LatticePlatform.__init__(self, "ice40-lp8k-cm81", _io,
+                                 toolchain="icestorm")
 
     def do_finalize(self, fragment):
-        XilinxPlatform.do_finalize(self, fragment)
+        LatticePlatform.do_finalize(self, fragment)
 
 #
 # design
@@ -52,7 +47,7 @@ class Blink(Module):
         # combinatorial assignements
         self.comb += []
 
-module = Blink(1, 100e6, platform.request("user_led"))
+module = Blink(1, 16e6, platform.request("user_led"))
 
 #
 # build
