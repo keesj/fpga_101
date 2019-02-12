@@ -7,24 +7,17 @@ from migen.build.xilinx import XilinxPlatform
 #
 
 _io = [
-    ("user_led",  0, Pins("H17"), IOStandard("LVCMOS33")),
-
-    ("user_sw",  0, Pins("J15"), IOStandard("LVCMOS33")),
-
-    ("user_btn", 0, Pins("N17"), IOStandard("LVCMOS33")),
-
-    ("clk100", 0, Pins("E3"), IOStandard("LVCMOS33")),
-
-    ("cpu_reset", 0, Pins("C12"), IOStandard("LVCMOS33")),
+    ("user_led", 0, Pins("P112"), IOStandard("LVCMOS33"), Drive(24), Misc("SLEW=QUIETIO")),
+    ("clk32", 0, Pins("P94"), IOStandard("LVCMOS33")),
 ]
 
 
 class Platform(XilinxPlatform):
-    default_clk_name = "clk100"
-    default_clk_period = 10.0
+    default_clk_name = "clk32"
+    default_clk_period = 31.25
 
     def __init__(self):
-        XilinxPlatform.__init__(self, "xc7a100t-CSG324-1", _io, toolchain="vivado")
+        XilinxPlatform.__init__(self, "xc6slx9-tqg144-2", _io)
 
     def do_finalize(self, fragment):
         XilinxPlatform.do_finalize(self, fragment)
@@ -52,7 +45,7 @@ class Blink(Module):
         # combinatorial assignements
         self.comb += []
 
-module = Blink(1, 100e6, platform.request("user_led"))
+module = Blink(1, 32e6, platform.request("user_led"))
 
 #
 # build
