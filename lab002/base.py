@@ -14,28 +14,30 @@ from core import *
 #
 
 _io = [
-    ("user_led",  0, Pins("H17"), IOStandard("LVCMOS33")),
+    # Led on board
+    ("user_led",  0, Pins("P112"), IOStandard("LVCMOS33")),
 
-    ("user_sw",  0, Pins("J15"), IOStandard("LVCMOS33")),
+    # Logic Start MegaWing JOY SELECT
+    ("user_sw",  0, Pins("P47"), IOStandard("LVCMOS33")),
 
-    ("user_btn_r", 0, Pins("M17"), IOStandard("LVCMOS33")),
-    ("user_btn_l", 0, Pins("P17"), IOStandard("LVCMOS33")),
+    # JOY RIGHT AND LEFT
+    ("user_btn_r", 0, Pins("P59"), IOStandard("LVCMOS33")),
+    ("user_btn_l", 0, Pins("P57"), IOStandard("LVCMOS33")),
 
-    ("clk100", 0, Pins("E3"), IOStandard("LVCMOS33")),
+    ("clk32", 0, Pins("P94"), IOStandard("LVCMOS33")),
 
-    ("cpu_reset", 0, Pins("C12"), IOStandard("LVCMOS33")),
-
-    ("display_cs_n",  0, Pins("J17"), IOStandard("LVCMOS33")),
-    ("display_abcdefg",  0, Pins("T10 R10 K16 K13 P15 T11 L18 H15"), IOStandard("LVCMOS33")),
+    # 7 segment display
+    ("display_cs_n",  0, Pins("P85 P79 P56 P48"), IOStandard("LVCMOS33")),
+    ("display_abcdefg",  0, Pins("P75 P83 P66 P67 P58 P61 P81 P51"), IOStandard("LVCMOS33")),
 ]
 
 
 class Platform(XilinxPlatform):
-    default_clk_name = "clk100"
-    default_clk_period = 10.0
+    default_clk_name = "clk32"
+    default_clk_period = 31.25
 
     def __init__(self):
-        XilinxPlatform.__init__(self, "xc7a100t-CSG324-1", _io, toolchain="vivado")
+        XilinxPlatform.__init__(self, "xc6slx9-tqg144-2", _io)
 
     def do_finalize(self, fragment):
         XilinxPlatform.do_finalize(self, fragment)
@@ -67,7 +69,7 @@ platform = Platform()
 
 # create our main module (fpga description)
 class Clock(Module):
-    sys_clk_freq = int(100e6)
+    sys_clk_freq = int(32e6)
     def __init__(self):
         # -- TO BE COMPLETED --
         # Tick generation : timebase
