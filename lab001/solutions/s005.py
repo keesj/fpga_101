@@ -7,28 +7,25 @@ from migen.build.xilinx import XilinxPlatform
 #
 
 _io = [
-    ("user_led",  0, Pins("H17"), IOStandard("LVCMOS33")),
+    ("user_led",  0, Pins("P123"), IOStandard("LVCMOS33")),
+    ("user_led",  1, Pins("p124"), IOStandard("LVCMOS33")),
+    ("user_led",  2, Pins("P126"), IOStandard("LVCMOS33")),
+    ("user_led",  3, Pins("P127"), IOStandard("LVCMOS33")),
+    ("user_led",  4, Pins("P131"), IOStandard("LVCMOS33")),
+    ("user_led",  5, Pins("P132"), IOStandard("LVCMOS33")),
+    ("user_led",  6, Pins("P133"), IOStandard("LVCMOS33")),
+    ("user_led",  7, Pins("P134"), IOStandard("LVCMOS33")),
 
-    ("user_sw",  0, Pins("J15"), IOStandard("LVCMOS33")),
-
-    ("user_btn", 0, Pins("N17"), IOStandard("LVCMOS33")),
-
-    ("clk100", 0, Pins("E3"), IOStandard("LVCMOS33")),
-
-    ("cpu_reset", 0, Pins("C12"), IOStandard("LVCMOS33")),
-
-    ("user_rgb_led_r", 0, Pins("N16"), IOStandard("LVCMOS33")),
-    ("user_rgb_led_g", 0, Pins("R11"), IOStandard("LVCMOS33")),
-    ("user_rgb_led_b", 0, Pins("G14"), IOStandard("LVCMOS33")),
+    ("clk32", 0, Pins("P94"), IOStandard("LVCMOS33")),
 ]
 
 
 class Platform(XilinxPlatform):
-    default_clk_name = "clk100"
-    default_clk_period = 10.0
+    default_clk_name = "clk32"
+    default_clk_period = 31.25
 
     def __init__(self):
-        XilinxPlatform.__init__(self, "xc7a100t-CSG324-1", _io, toolchain="vivado")
+        XilinxPlatform.__init__(self, "xc6slx9-tqg144-2", _io)
 
     def do_finalize(self, fragment):
         XilinxPlatform.do_finalize(self, fragment)
@@ -58,15 +55,14 @@ class Blink(Module):
 
 
 class RGBBlink(Module):
-    def __init__(self, platform):
-        # submodules
-        blink_r = Blink(1, 100e6, platform.request("user_rgb_led_r"))
-        blink_g = Blink(2, 100e6, platform.request("user_rgb_led_g"))
-        blink_b = Blink(4, 100e6, platform.request("user_rgb_led_b"))
-        self.submodules += blink_r, blink_g, blink_b
+    def __init__(self,platform):
+        # sub modules
+        led_a = Blink(1, 32e6, platform.request("user_led",0))
+        led_b = Blink(2, 32e6, platform.request("user_led",1))
+        led_c = Blink(4, 32e6, platform.request("user_led",2))
+        self.submodules += led_a, led_b, led_c
 
 module = RGBBlink(platform)
-
 #
 # build
 #
