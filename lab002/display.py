@@ -14,12 +14,24 @@ class SevenSegment(Module):
         # value to abcd segments dictionary.
         # Here we create a table to translate each of the 16 possible input
         # values to abdcefg segments control.
-        # -- TO BE COMPLETED --
         cases = {
           0x0: abcdefg.eq(0b0111111),
-          # [...]
+          0x1: abcdefg.eq(0b0000110),
+          0x2: abcdefg.eq(0b1011011),
+          0x3: abcdefg.eq(0b1001111),
+          0x4: abcdefg.eq(0b1100110),
+          0x5: abcdefg.eq(0b1101101),
+          0x6: abcdefg.eq(0b1111101),
+          0x7: abcdefg.eq(0b0000111),
+          0x8: abcdefg.eq(0b1111111),
+          0x9: abcdefg.eq(0b1101111),
+          0xa: abcdefg.eq(0b1110111),
+          0xb: abcdefg.eq(0b1111100),
+          0xc: abcdefg.eq(0b0001111),
+          0xd: abcdefg.eq(0b1011110),
+          0xe: abcdefg.eq(0b1111001),
+          0xf: abcdefg.eq(0b1110001),
         }
-        # -- TO BE COMPLETED --
 
         # combinatorial assignement
         self.comb += Case(value, cases)
@@ -28,9 +40,8 @@ class SevenSegment(Module):
 class Display(Module):
     def __init__(self, sys_clk_freq, cs_period=0.001):
         # module's interface
-        self.values = Array(Signal(5) for i in range(6))  # input
-
-        self.cs = Signal(6)      # output
+        self.values = Array(Signal(4) for i in range(4))  # input
+        self.cs = Signal(4)      # output
         self.abcdefg = Signal(7) # output
 
         # # #
@@ -43,22 +54,17 @@ class Display(Module):
         # create a tick every cs_period
         self.submodules.tick = Tick(sys_clk_freq, cs_period)
 
-        # rotate cs 6 bits signals to alternate seven segments
-		# cycle 0 : 0b000001
-	    # cycle 1 : 0b000010
-	    # cycle 2 : 0b000100
-	    # cycle 3 : 0b001000
-	    # cycle 4 : 0b010000
-	    # cycle 5 : 0b010000
-	    # cycle 6 : 0b100000
-		# cycle 7 : 0b000001
-        cs = Signal(6, reset=0b000001)
+        # rotate cs 4 bits signals to alternate seven segments
+        cs = Signal(4, reset=0b0001)
+        
         # synchronous assigment
         self.sync += [
             If(self.tick.ce,
-                # -- TO BE COMPLETED --
-                # [...] rotate cs
-                # -- TO BE COMPLETED --
+                cs[0].eq(cs[3]),
+                cs[1].eq(cs[0]),
+                cs[2].eq(cs[1]),
+                cs[3].eq(cs[2]),
+                #cs.eq(cs << 1 | (cs[3] >> 3) & 0x1)
             )
         ]
         # cominatorial assigment
@@ -69,8 +75,10 @@ class Display(Module):
         # to input value selection.
         # -- TO BE COMPLETED --
         cases = {
-            0b000001 : seven_segment.value.eq(self.values[0]),
-            # [...]
+            0b0001 : seven_segment.value.eq(self.values[0]),
+            0b0010 : seven_segment.value.eq(self.values[1]),
+            0b0100 : seven_segment.value.eq(self.values[2]),
+            0b1000 : seven_segment.value.eq(self.values[3]),
         }
         # -- TO BE COMPLETED --
         # cominatorial assigment
@@ -84,6 +92,7 @@ if __name__ == '__main__':
 
     def show_seven_segment(abcdefg):
         line0 = ["   ", " _ "]
+        # b + g^2 + f^4
         line1 = ["   ", "  |", " _ ", " _|", "|  ", "| |" , "|_ ", "|_|"]
         a = abcdefg & 0b1;
         fgb = ((abcdefg >> 1) & 0b001) | ((abcdefg >> 5) & 0b010) | ((abcdefg >> 3) & 0b100)
@@ -93,7 +102,7 @@ if __name__ == '__main__':
         print(line1[edc])
 
     def dut_tb(dut):
-        for i in range(16):
+        for i in range(0xf +1):
             yield dut.value.eq(i)
             yield
             show_seven_segment((yield dut.abcdefg))
@@ -105,7 +114,7 @@ if __name__ == '__main__':
     dut = Display(100e6, 0.000001)
     def dut_tb(dut):
         for i in range(4096):
-            for j in range(6):
+            for j in range(4):
                 yield dut.values[j].eq(i + j)
             yield
 

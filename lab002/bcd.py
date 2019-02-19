@@ -3,7 +3,7 @@ from migen.fhdl import verilog
 
 # https://en.wikipedia.org/wiki/Double_dabble
 
-class _BCD(Module):
+class BCD(Module):
     def __init__(self):
         # module's interface
         self.value = Signal(8)     # input
@@ -64,7 +64,7 @@ class _BCD(Module):
         ]
 
 
-class BCD(Module):
+class _BCD(Module):
     def __init__(self):
         # -- TO BE COMPLETED --
         self.my_input = Signal()   # input

@@ -30,7 +30,7 @@ class Tick(Module):
 
 
 if __name__ == '__main__':
-    dut = Tick(100e6, 1e-6)
+    dut = Tick(32e6, 1e-6)
 
     def dut_tb(dut):
         yield dut.enable.eq(1)

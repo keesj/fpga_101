@@ -4,7 +4,7 @@ from migen.build.xilinx import XilinxPlatform
 from migen.genlib.cdc import MultiReg
 
 from tick import *
-from display import *
+from display import Display as Dis
 from bcd import *
 from core import *
 
@@ -28,7 +28,7 @@ _io = [
 
     # 7 segment display
     ("display_cs_n",  0, Pins("P85 P79 P56 P48"), IOStandard("LVCMOS33")),
-    ("display_abcdefg",  0, Pins("P75 P83 P66 P67 P58 P61 P81 P51"), IOStandard("LVCMOS33")),
+    ("display_abcdefg",  0, Pins("P75 P83 P66 P67 P58 P61 P81"), IOStandard("LVCMOS33")),
 ]
 
 
@@ -73,12 +73,27 @@ class Clock(Module):
     def __init__(self):
         # -- TO BE COMPLETED --
         # Tick generation : timebase
+        tick = Tick(self.sys_clk_freq,1)
+        self.submodules += tick
 
         # Display
-
+        disp = Dis(self.sys_clk_freq)
+        self.submodules += disp
         # Core : counts ss/mm/hh
+        core = CoreDus()
+        self.submodules += core
+        #c.
+        # set mm/hh
+        btn0_press = UserButtonPress(platform.request("user_btn_r"))
+        btn1_press = UserButtonPress(platform.request("user_btn_l"))
+        btn2_press = UserButtonPress(platform.request("user_sw"))
+        self.submodules += btn0_press, btn1_press, btn2_press
 
         # set mm/hh
+        bcd_seconds = BCD()
+        bcd_minutes = BCD()
+
+        self.submodules += bcd_seconds,bcd_minutes
 
         # Binary Coded Decimal: convert ss/mm/hh to decimal values
 
@@ -87,12 +102,22 @@ class Clock(Module):
         # combinatorial assignement
         self.comb += [
             # Connect tick to core (core timebase)
+            core.tick.eq(tick.ce),
+            core.inc_minutes.eq(btn1_press.rising),
+            core.reset_time.eq(btn2_press.rising),
 
             # Set minutes/hours
-
+            bcd_seconds.value.eq(core.seconds),
+            disp.values[3].eq(bcd_seconds.ones),
+            disp.values[2].eq(bcd_seconds.tens),
+            
             # Convert core seconds to bcd and connect
             # to display
-
+            bcd_minutes.value.eq(core.minutes),
+            disp.values[0].eq(bcd_minutes.tens),
+            disp.values[1].eq(bcd_minutes.ones),
+            #disp.values[2].eq(0x3),
+            #disp.values[3].eq(0x4),
             # Convert core minutes to bcd and connect
             # to display
 
@@ -100,6 +125,8 @@ class Clock(Module):
             # to display
 
             # Connect display to pads
+            platform.request("display_cs_n").eq(~disp.cs),
+            platform.request("display_abcdefg").eq(~disp.abcdefg)
         ]
         # -- TO BE COMPLETED --
 
@@ -108,5 +135,9 @@ module = Clock()
 #
 # build
 #
+def base_test(dut):
+        for i in range(10240):
+                yield	
 
 platform.build(module)
+#run_simulation(module,base_test(module),vcd_name="base.vcd")

@@ -17,7 +17,7 @@ from migen import *
 # or try both...
 
 
-class Core(Module):
+class CoreDus(Module):
     def __init__(self):
         # module's interface
         self.tick = Signal()     # input
@@ -27,17 +27,35 @@ class Core(Module):
 
         # set interface
         self.inc_minutes = Signal() # input
-        self.inc_hours = Signal()   # output
-
+        self.inc_hours = Signal()   # input
+        self.reset_time = Signal()   # input
         # # #
 
         # synchronous assigment
         self.sync += [
             # -- TO BE COMPLETED --
             # at each tick
-            If(self.tick,
+            If(self.inc_minutes,
+                self.minutes.eq(self.minutes + 1),
+            ),    
+            If(self.reset_time,
+                self.minutes.eq(0),
+                self.seconds.eq(0),
+                self.hours.eq(0),
+            )    
+            ,If(self.tick,
                 self.seconds.eq(self.seconds + 1),
-                # [...]
+                If(self.seconds +1 == 60,
+                    self.seconds.eq(0),
+                    self.minutes.eq(self.minutes + 1),
+                    If(self.minutes +1 == 60,
+                        self.minutes.eq(0),
+                        self.hours.eq(self.hours + 1),
+                        If(self.hours +1 == 24,
+                            self.hours.eq(0),
+                        )
+                    )
+                ),
             )
             # -- TO BE COMPLETED --
         ]
