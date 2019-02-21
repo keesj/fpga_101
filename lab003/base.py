@@ -44,7 +44,7 @@ _io = [
 
 
     # 7 segment display
-    ("display_cs_n",  0, Pins("P85 P79 P56 P48"), IOStandard("LVCMOS33")),
+    ("display_cs_n",  0, Pins("P48 P56 P79 P85"), IOStandard("LVCMOS33")),
     ("display_abcdefg",  0, Pins("P75 P83 P66 P67 P58 P61 P81"), IOStandard("LVCMOS33")),
 
     ("clk32", 0, Pins("P94"), IOStandard("LVCMOS33")),
