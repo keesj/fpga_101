@@ -20,6 +20,7 @@ def display_time(hour, minute, second):
     display_write(1, (second//10)%10)
     display_write(2, minute%10)
     display_write(3, (minute//10)%10)
+    # bellow is not connected
     display_write(4, hour%10)
     display_write(5, (hour//10)%10)
 
